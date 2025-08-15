@@ -1,0 +1,98 @@
+@model List<TuProyecto.Models.Perro>
+@{
+    ViewData["Title"] = "Razas de Perros";
+}
+
+<div class="text-center mt-4">
+    <h1 class="fw-bold text-primary">Razas de Perros</h1>
+    <p class="text-muted">Descubre nuestra completa guía de razas caninas</p>
+
+    <div class="mb-4">
+        <button class="btn btn-outline-dark active" data-filter="Todas">Todas</button>
+        <button class="btn btn-outline-dark" data-filter="Pequeño">Pequeñas</button>
+        <button class="btn btn-outline-dark" data-filter="Mediano">Medianas</button>
+        <button class="btn btn-outline-dark" data-filter="Grande">Grandes</button>
+    </div>
+</div>
+
+<div id="perrosContainer" class="row g-4">
+    @foreach (var perro in Model)
+    {
+        <div class="col-md-4 perro-card" data-category="@perro.Tamano">
+            <div class="card h-100 shadow-sm">
+                <img src="@perro.Imagen" class="card-img-top" alt="@perro.Nombre" style="height:250px;object-fit:cover;">
+                <div class="card-body">
+                    <h5 class="card-title">@perro.Nombre</h5>
+                    <p class="card-text">
+                        <strong>Peso:</strong> @perro.Peso <br />
+                        <strong>Tamaño:</strong> @perro.Tamano <br />
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="mt-4 text-center">
+    <button id="prevBtn" class="btn btn-secondary me-2">Anterior</button>
+    <span id="pageInfo" class="fw-bold"></span>
+    <button id="nextBtn" class="btn btn-secondary ms-2">Siguiente</button>
+</div>
+
+@section Scripts {
+<script>
+    let itemsPerPage = 6;
+    let currentPage = 1;
+    let allCardsOriginal = Array.from(document.querySelectorAll(".perro-card"));
+    let filteredCards = [...allCardsOriginal];
+
+    function showPage(page) {
+        let start = (page - 1) * itemsPerPage;
+        let end = start + itemsPerPage;
+
+        allCardsOriginal.forEach(card => card.style.display = "none");
+        filteredCards.forEach((card, index) => {
+            if (index >= start && index < end) {
+                card.style.display = "block";
+            }
+        });
+
+        document.getElementById("pageInfo").textContent = 
+            `Página ${page} de ${Math.ceil(filteredCards.length / itemsPerPage)}`;
+    }
+
+    document.getElementById("prevBtn").addEventListener("click", () => {
+        if (currentPage > 1) {
+            currentPage--;
+            showPage(currentPage);
+        }
+    });
+
+    document.getElementById("nextBtn").addEventListener("click", () => {
+        if (currentPage < Math.ceil(filteredCards.length / itemsPerPage)) {
+            currentPage++;
+            showPage(currentPage);
+        }
+    });
+
+    document.querySelectorAll("[data-filter]").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll("[data-filter]").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+
+            let filter = btn.getAttribute("data-filter");
+
+            if (filter === "Todas") {
+                filteredCards = [...allCardsOriginal];
+            } else {
+                filteredCards = allCardsOriginal.filter(card => card.getAttribute("data-category") === filter);
+            }
+
+            currentPage = 1;
+            showPage(currentPage);
+        });
+    });
+
+    showPage(currentPage);
+</script>
+}
