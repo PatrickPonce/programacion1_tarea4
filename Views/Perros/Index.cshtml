@@ -7,7 +7,7 @@
     <h1 class="fw-bold text-primary display-5">Razas de Perros</h1>
     <p class="text-muted fs-5">Lista de perros por tamaños</p>
 
-    <div class="mb-4 d-flex flex-wrap justify-content-center gap-2">
+    <div id="filterButtons" class="mb-4 d-flex flex-wrap justify-content-center gap-2">
         <button class="btn btn-outline-primary active" data-filter="Todas">Todas</button>
         <button class="btn btn-outline-success" data-filter="Pequeño">Pequeñas</button>
         <button class="btn btn-outline-warning" data-filter="Mediano">Medianas</button>
@@ -15,67 +15,8 @@
     </div>
 </div>
 
-<div id="perrosContainer" class="row g-4">
-    @foreach (var perro in Model)
-    {
-        <div class="col-md-4 perro-card" data-category="@perro.Tamano">
-            <div class="card h-100 shadow-lg border-0 rounded-4 overflow-hidden hover-card">
-                <div class="img-container">
-                    <img src="@perro.Imagen" class="card-img-top" alt="@perro.Nombre">
-                </div>
-                <div class="card-body text-center">
-                    <h5 class="card-title fw-bold">@perro.Nombre</h5>
-                    <p>
-                        @if (perro.Tamano == "Pequeño")
-                        {
-                            <span class="badge bg-success fs-6 px-3 py-2">Pequeño</span>
-                        }
-                        else if (perro.Tamano == "Mediano")
-                        {
-                            <span class="badge bg-warning text-dark fs-6 px-3 py-2">Mediano</span>
-                        }
-                        else if (perro.Tamano == "Grande")
-                        {
-                            <span class="badge bg-danger fs-6 px-3 py-2">Grande</span>
-                        }
-                    </p>
-                    <p class="card-text text-muted small mt-3">
-                        <strong>Peso:</strong> @perro.Peso <br />
-                        <strong>Edad:</strong> @perro.Edad
-                    </p>
-                </div>
-            </div>
-        </div>
-    }
-</div>
+<div id="perrosContainer" class="row g-4"></div>
 
-@section Scripts {
 <script>
-    let allCardsOriginal = Array.from(document.querySelectorAll(".perro-card"));
-    let filteredCards = [...allCardsOriginal];
-
-    function showCards() {
-        allCardsOriginal.forEach(card => card.style.display = "none");
-        filteredCards.forEach(card => card.style.display = "block");
-    }
-
-    document.querySelectorAll("[data-filter]").forEach(btn => {
-        btn.addEventListener("click", () => {
-            document.querySelectorAll("[data-filter]").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-
-            let filter = btn.getAttribute("data-filter");
-
-            if (filter === "Todas") {
-                filteredCards = [...allCardsOriginal];
-            } else {
-                filteredCards = allCardsOriginal.filter(card => card.getAttribute("data-category") === filter);
-            }
-
-            showCards();
-        });
-    });
-
-    showCards();
+    window.perrosData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
 </script>
-}
